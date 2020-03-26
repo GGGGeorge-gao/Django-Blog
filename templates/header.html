@@ -1,0 +1,98 @@
+<!-- 定义导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+
+        <!-- 导航栏商标 -->
+        <a class="navbar-brand" href="{% url "my_blog:article_list" %}">我的博客</a>
+
+        <!-- 导航入口 -->
+        <div>
+            <ul class="navbar-nav">
+                <!-- 条目 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'my_blog:article_list' %}">文章</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'my_blog:article_create' %}">来写一篇吧</a>
+                </li>
+
+                {% if user.is_authenticated %}
+
+                    {# 如果用户已经登录，则显示用户名下拉框 #}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ user.username }}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'userprofile:logout' %}">退出登录</a>
+
+                            <a class="dropdown-item" href="{% url 'userprofile:edit' user.id %}">修改信息</a>
+
+                            <a class="dropdown-item" href="#" onclick="user_delete()">删除用户</a>
+                        </div>
+                    </li>
+
+                {% else %}
+                    {# 如果未登录，则显示“登录” #}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'userprofile:login' %}">登录</a>
+                    </li>
+
+                {% endif %}
+
+            </ul>
+        </div>
+
+    </div>
+</nav>
+
+{% if user.is_authenticated %}
+    <form
+            style="display:none;"
+            id="user_delete"
+            action="{% url "userprofile:delete" user.id %}"
+            method="post"
+    >
+        {% csrf_token %}
+        <button type="submit">发送</button>
+    </form>
+    <script>
+        function user_delete() {
+            // 调用layer弹窗组件
+            layer.open({
+                title: "确认删除",
+                content: "确认删除用户资料吗？",
+                yes: function (index, layero) {
+                    $('form#user_delete button').click();
+                    layer.close(index);
+                },
+            })
+        }
+    </script>
+{% endif %}
+
+{# ... #}
+
+{#{% if user.is_authenticated %}#}
+{##}
+{#        <a type="submit">发送</a>#}
+{#        </form>#}
+{#        <script>#}
+{#            function comment_delete() {#}
+{#                layer.open({#}
+{#                    title: "确认删除",#}
+{#                    content: "确认删除此评论吗？",#}
+{#                    yes: function (index, layero) {#}
+{#                        $('form#comment_delete button').click();#}
+{#                        layer.close(index)#}
+{#                    },#}
+{#                })#}
+{#            }#}
+{#        </script>#}
+{##}
+{#    {% endif %}#}
+
+
+

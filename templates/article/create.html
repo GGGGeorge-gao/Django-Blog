@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}{{ type }}{% endblock title %}
+
+{% block content %}
+    {# 写文章表单 #}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <br>
+                <form method="post" action="." enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {# 文章标题 #}
+                    <div class="form-group">
+                        <label for="title">文章标题：</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ title }}">
+                    </div>
+
+                    {# 文章标题 #}
+                    <div class="form-group">
+                        <label for="avatar">标题图片</label>
+                        <input type="file" class="form-control-file" name="avatar" id="avatar">
+                    </div>
+
+                    {# 选择栏目 #}
+                    <div class="form-group">
+                        <label for="columns">选择栏目</label>&nbsp;&nbsp;&nbsp;&nbsp;
+
+                        {# 新建栏目 #}
+                        <button type="button" href="{% url "my_blog:column_create" %}" class="btn btn-success"
+                                onclick="location.href='{% url "my_blog:column_create" %}'">新建栏目
+                        </button>
+
+                        <select class="form-control" id="columns" name="column">
+
+                            <option value="none">无</option>
+                            {% for column in columns %}
+                                <option value="{{ column.id }}"
+                                    {% if article_column.id == column.id %}
+                                        selected="selected"
+                                    {% endif %}>
+                                    {{ column }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    {# 文章标签 #}
+                    <div class="form-group">
+                        <label for="tags">标签</label>
+                        <input type="text" class="form-control col-3" id="tags" name="tags" value="{{ tags }}">
+                    </div>
+
+                    {# 文章正文 #}
+                    <div class="form-group">
+                        <label for="body">文章正文</label>
+                        {# 文本区域 #}
+                        <textarea type="text" class="form-control" id="body" name="body"
+                                  rows="12">{{ body }}</textarea>
+                    </div>
+                    {# 提交按钮 #}
+                    <button type="submit" class="btn btn-primary">完成</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

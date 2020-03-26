@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}创建栏目{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <br>
+                <form method="post" action=".">
+                    {% csrf_token %}
+
+                    {# 栏目名称 #}
+                    <div class="form-group">
+                        <label for="title">栏目名称</label>
+                        <input type="text" class="form-control" id="title" name="title">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">完成</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

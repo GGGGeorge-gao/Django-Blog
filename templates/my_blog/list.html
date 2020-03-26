@@ -1,0 +1,191 @@
+{# extends表明此页面继承 base.html 文件 #}
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{# 写入 base.html 中定义的 title #}
+{% block title %}
+    首页
+{% endblock title %}
+
+{# 写入 base.html 定义的 content #}
+{% block content %}
+
+    <div class="container">
+
+        {# 筛选 最新 / 最热 #}
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url "my_blog:article_list" %}?search={{ search }}">
+                        最新
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url "my_blog:article_list" %}?order=total_views&search={{ search }}">
+                        最热
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url "my_blog:article_list" %}">
+                        返回首页
+                    </a>
+                </li>
+            </ol>
+        </nav>
+
+        {# 搜索栏 #}
+        <div class="row">
+            <div class="col-auto mr-auto">
+                <form class="form-inline">
+                    <label class="sr-only">content</label>
+                    <input type="text" class="form-control mb-2 mr-sm-2" name="search" placeholder="搜索文章..." required>
+                    <button type="submit" class="btn btn-primary">搜索</button>
+                </form>
+            </div>
+        </div>
+
+        {# 搜索提示语 #}
+        {% if search %}
+            {% if articles %}
+                <h4><span style="color: red">"{{ search }}"</span>的搜索结果如下： </h4>
+                <hr>
+            {% else %}
+                <h4>暂无<span style="color:red">"{{ search }}"</span>有关的文章。 </h4>
+            {% endif %}
+        {% endif %}
+
+        <div class="row mt-2">
+            {% for article in articles %}
+                <!-- 文章内容 -->
+                <div class="col-12">
+
+                    {# 标题图 #}
+                    {% if article.avatar %}
+                        <div class="col">
+                            <img src="{{ article.avatar.url }}" alt="avatar"
+                                 style="max-width: 100px; border-radius: 20px">
+                        </div>
+                    {% endif %}
+
+                    {# 标题 #}
+                    <h4>
+                        <b>
+                            <a href="{% url "my_blog:article_detail" article.id %}" style="color:black;">
+                                {{ article.title }}
+                            </a>
+                        </b>
+                    </h4>
+
+                    {# 标签 #}
+                    {% if article.tags %}
+                        <span>
+                            {% for tag in article.tags %}
+                                <a href="#" class="badge badge-secondary">
+                                    {{ tag }}
+                                </a>
+                            {% endfor %}
+                        </span>
+                    {% endif %}
+
+                    {# 摘要 #}
+                    <div>
+                        <p style="color:grey;">
+                            {{ article.body|slice:':100' }}...
+                        </p>
+                    </div>
+                    {# 注脚 #}
+                    <p>
+                        <span style="color: #545b62;">
+                            作者：{{ article.author }}&nbsp;&nbsp;
+                        </span>
+                        <span style="color:green;">
+                            {{ article.total_views }} 浏览&nbsp;&nbsp;
+                        </span>
+                        <span style="color:blue;">
+                            {{ article.created|date:'Y-m-d' }} 发布&nbsp;&nbsp;
+                        </span>
+                        <span style="color:darkred;">
+                            {{ article.updated|date:'Y-m-d' }} 更新&nbsp;&nbsp;
+                        </span>
+
+                        {# 栏目 #}
+                        <span>
+                            {% if article.columns.title %}
+                                <a href="?column={{ article.columns.title }}&order={{ order }}&search={{ search }}">
+                                    <button class="btn btn-sm mb-2" type="button">
+                                        {{ article.columns.title }}
+                                    </button>
+                                </a>
+                            {% endif %}
+                        </span>
+
+                    </p>
+                    <hr>
+                </div>
+                {#                <hr style="width: 100%;"/>#}
+            {% endfor %}
+        </div>
+        <a href="{% url 'my_blog:article_create' %}" class="btn btn-info">新建文章</a>
+
+        {# 显示页码 #}
+        <div class="pagination row">
+            <div class="m-auto">
+            <span class="step-links">
+
+                {# 如果不是第一页，则显示上翻按钮 #}
+                {% if articles.has_previous %}
+                    <a href="?page={{ articles.previous_page_number }}&order={{ order }}&search={{ search }}"
+                       class="btn btn-info">上一页</a>
+
+
+                    <a href="?page=1&order={{ order }}&search={{ search }}" class="btn btn-success">
+                        &laquo; 1
+                    </a>
+                    <span>...</span>
+                    <a href="?page={{ articles.previous_page_number }}&order={{ order }}&search={{ search }}"
+                       class="btn btn-primary">
+                        {{ articles.previous_page_number }}
+                    </a>
+                {% endif %}
+
+
+                <span class="current btn btn-danger btn-lg">
+                    {{ articles.number }}
+                </span>
+
+                {# 如果不是最后一页，显示下翻按钮 #}
+                {% if articles.has_next %}
+
+                    <a href="?page={{ articles.next_page_number }}&order={{ order }}&search={{ search }}"
+                       class="btn btn-primary">
+                        {{ articles.next_page_number }}
+                    </a>
+                    <span>...</span>
+                    <a href="?page={{ articles.paginator.num_pages }}&order={{ order }}&search={{ search }}"
+                       class="btn btn-success">
+                        {{ articles.paginator.num_pages }} &raquo;
+                    </a>
+                    <a href="?page={{ articles.next_page_number }}&order={{ order }}&search={{ search }}"
+                       class="btn btn-info">
+                    下一页
+                    </a>
+                {% endif %}
+            </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function Color() {
+            this.r = Math.floor(Math.random() * 255);
+            this.g = Math.floor(Math.random() * 255);
+            this.b = Math.floor(Math.random() * 255);
+            this.color = 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',0.8)';
+        }
+    </script>
+
+
+{% endblock content %}
+
+
+
